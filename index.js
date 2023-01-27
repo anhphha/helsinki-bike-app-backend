@@ -9,6 +9,7 @@ const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
 const ConnectDB = require("./config/dbConnect");
 const journeySchema = require("./models/journeyModel");
+const stationnameSchema = require("./models/stationnameModel");
 
 
 const PORT = process.env.PORT || 3001;
@@ -75,18 +76,10 @@ app.get("/search", async (req, res) => {
               autocomplete: {
                 query: `"${req.query.departure_station}"`,
                 path: "departure_station_name",
-                // path: "return_station_name",
-                // fuzzy: {
-                //   maxEdits: 1,
-                // },
               },
               autocomplete: {
                 query: `"${req.query.return_station}"`,
                 path: "return_station_name",
-                // path: "return_station_name",
-                // fuzzy: {
-                //   maxEdits: 1,
-                // },
               },
             }]
           }
@@ -114,6 +107,40 @@ app.get("/search", async (req, res) => {
           _id: 1,
           departure_station_name: 1,
           return_station_name: 1,
+        },
+      },
+    ]);
+    res.json(result);
+  } catch (e) {
+    res.status(500).send({ message: e.message });
+  }
+});
+
+//Station Data Autocomplete
+app.get("/search", async (req, res) => {
+  try {
+    console.log(req.query);
+    let result = await stationnameSchema.aggregate([
+      {
+        $search: {
+          index: "Station Data Autocomplete",
+          autocomplete: {
+            query: `"${req.query.station_name}"`,
+            path: "station_name",
+            // path: "return_station_name",
+            // fuzzy: {
+            //   maxEdits: 1,
+            // },
+          },
+        },
+      },
+      {
+        $limit: 10,
+      },
+      {
+        $project: {
+          _id: 1,
+          station_name: 1,
         },
       },
     ]);
