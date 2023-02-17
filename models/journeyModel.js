@@ -1,3 +1,4 @@
+const { Int32 } = require("mongodb");
 const mongoose = require("mongoose");
 mongoose.set('strictQuery', false);
 
@@ -36,4 +37,4 @@ const journeySchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Journey", journeySchema);
+module.exports = mongoose.model("journeys", journeySchema);

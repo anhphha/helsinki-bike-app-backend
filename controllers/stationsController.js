@@ -1,4 +1,4 @@
-const Station = require("../models/stationModel");
+const Station = require("../models/stationNameModel");
 const prompt = require("prompt");
 
 //Get all stations
