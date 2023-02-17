@@ -58,15 +58,17 @@ app.get("/search", async (req, res) => {
 });
 
 //Journeys
-// app.get("/journey", async (req, res) => {
-//   try {
-//     console.log(req.query);
-//     let journey_result = await journeySchema.find({});
-//     res.json(journey_result);
-//   } catch (e) {
-//     res.status(500).send({ message: e.message });
-//   }
-// });
+app.get("/journeys", async (req, res) => {
+  try {
+    console.log(req.query);
+    let journey_result = await journeySchema.find({});
+    res.json(journey_result);
+  }
+  catch (e) {
+    console.error(e);
+    res.status(500).send({ message: e.message });
+  }
+});
 
 /** listen or Requests */
 /** Connect to Mongo */
