@@ -12,7 +12,7 @@ const journeySchema = new mongoose.Schema({
     default: undefined,
   },
   departure_station_id: {
-    type: String,
+    type: Number,
     default: undefined,
   },
   departure_station_name: {
@@ -20,7 +20,7 @@ const journeySchema = new mongoose.Schema({
     default: undefined,
   },
   return_station_id: {
-    type: String,
+    type: Number,
     default: undefined,
   },
   return_station_name: {
@@ -28,11 +28,11 @@ const journeySchema = new mongoose.Schema({
     default: undefined,
   },
   covered_distance: {
-    type: String,
+    type: Number,
     default: undefined,
   },
   duration: {
-    type: String,
+    type: Number,
     default: undefined,
   },
 });

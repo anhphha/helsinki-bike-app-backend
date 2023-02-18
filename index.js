@@ -46,6 +46,7 @@ app.get("/search", async (req, res) => {
             path: "name",
             fuzzy: {
               maxEdits: 1,
+              prefixLength: 2,
             },
           },
         },
@@ -61,10 +62,30 @@ app.get("/search", async (req, res) => {
 app.get("/journeys", async (req, res) => {
   try {
     console.log(req.query);
-    let journey_result = await journeySchema.find({});
-    res.json(journey_result);
-  }
-  catch (e) {
+    /**
+     * Tasks:
+     * - Get value from req.query (departure_station_id, arrival_station_id)
+     * - Transfer string to number using Number(). Example Number("115") => 115
+     * - Add those values (departure_station_id, arrival_station_id) from queries to .find() below
+     *
+     *
+     */
+    const departureStationId = Number(req.query.departure_station_id);
+    const returnStationId = Number(req.query.return_station_id);
+    console.log("Departure Station ID:", departureStationId);
+    console.log("Return Station ID:", returnStationId);
+
+    let journeyResult = await journeySchema.find({
+      departure_station_id: departureStationId,
+      return_station_id: returnStationId,
+    });
+
+    if (!journeyResult) {
+      return res.status(404).json({ message: "No journey found" });
+    }
+
+    res.json(journeyResult);
+  } catch (e) {
     console.error(e);
     res.status(500).send({ message: e.message });
   }
