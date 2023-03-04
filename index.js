@@ -3,7 +3,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const { logger, logEvents } = require("./middleware/logger");
-// const errorHandler = require("./middleware/errorHandler");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
@@ -27,6 +26,7 @@ app.use(express.urlencoded({ extended: false }));
 
 /** RESTFUL API */
 
+// Home page
 app.get("/", (req, res) => {
   res.send("Hello World!");
   console.log(req.body);
@@ -62,25 +62,32 @@ app.get("/search", async (req, res) => {
 app.get("/journeys", async (req, res) => {
   try {
     console.log(req.query);
-    /**
-     * Tasks:
-     * - Get value from req.query (departure_station_id, arrival_station_id)
-     * - Transfer string to number using Number(). Example Number("115") => 115
-     * - Add those values (departure_station_id, arrival_station_id) from queries to .find() below
-     *
-     *
-     */
-    const departureStationId = Number(req.query.departure_station_id);
-    const returnStationId = Number(req.query.return_station_id);
-    console.log("Departure Station ID:", departureStationId);
-    console.log("Return Station ID:", returnStationId);
 
-    let journeyResult = await journeySchema.find({
-      departure_station_id: departureStationId,
-      return_station_id: returnStationId,
-    });
+    //Good Solution
+    const departureStationId = req.query.departure_station_id
+      ? Number(req.query.departure_station_id)
+      : undefined;
+    const returnStationId = req.query.return_station_id
+      ? Number(req.query.return_station_id)
+      : undefined;
+    if (!departureStationId && !returnStationId) {
+      return res.status(400).json({
+        message: "must have either departure or return station id",
+      });
+    }
 
-    if (!journeyResult) {
+    const hasAllQuery = {};
+    if (departureStationId) {
+      hasAllQuery.departure_station_id = departureStationId;
+    }
+    if (returnStationId) {
+      hasAllQuery.return_station_id = returnStationId;
+    }
+    console.log({ hasAllQuery });
+
+    const journeyResult = await journeySchema.find(hasAllQuery);
+
+    if (!journeyResult.length) {
       return res.status(404).json({ message: "No journey found" });
     }
 
