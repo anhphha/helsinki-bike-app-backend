@@ -10,7 +10,6 @@ const ConnectDB = require("./config/dbConnect");
 const journeySchema = require("./models/journeyModel");
 const stationSchema = require("./models/stationModel");
 const { pipeline } = require("stream");
-
 const PORT = process.env.PORT || 3001;
 const app = express();
 
