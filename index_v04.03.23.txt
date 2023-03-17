@@ -1,0 +1,205 @@
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const path = require("path");
+const { logger, logEvents } = require("./middleware/logger");
+// const errorHandler = require("./middleware/errorHandler");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const corsOptions = require("./config/corsOptions");
+const ConnectDB = require("./config/dbConnect");
+const journeySchema = require("./models/journeyModel");
+const stationSchema = require("./models/stationModel");
+const { pipeline } = require("stream");
+
+const PORT = process.env.PORT || 3001;
+const app = express();
+
+console.log(process.env.NODE_ENV);
+ConnectDB();
+
+// Cors_ Cross origin resource sharing_ Security usage
+app.use(cors(corsOptions));
+
+//middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+/** RESTFUL API */
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+  console.log(req.body);
+});
+
+//Autocomplete
+app.get("/search", async (req, res) => {
+  try {
+    console.log(req.query);
+    //let result = await stationSchema.find({});
+    let result = await stationSchema.aggregate([
+      {
+        $search: {
+          index: "id_station",
+          autocomplete: {
+            query: req.query.station_name,
+            path: "name",
+            fuzzy: {
+              maxEdits: 1,
+              prefixLength: 2,
+            },
+          },
+        },
+      },
+    ]);
+    res.json(result);
+  } catch (e) {
+    res.status(500).send({ message: e.message });
+  }
+});
+
+//Journeys
+app.get("/journeys", async (req, res) => {
+  try {
+    console.log(req.query);
+
+    /**
+     * Tasks:
+     * - Get value from req.query (departure_station_id, arrival_station_id)
+     * - Transfer string to number using Number(). Example Number("115") => 115
+     * - Add those values (departure_station_id, arrival_station_id) from queries to .find() below
+     *
+     *
+     */
+
+    // console.log("Departure Station ID:", departureStationId);
+    // console.log("Return Station ID:", returnStationId);
+
+    /**
+     * 1. departureStation ID, !returnStationId
+     * 2. !departureStation ID, returnStationId
+     */
+
+    // Advance solution ( more dynamic)
+
+    const mappedQueries = [
+      {
+        queryKey: "departureStationId",
+        queryDbField: "departure_station_id",
+        value: Number(req.query.departure_station_id),
+        required: true,
+      },
+      {
+        queryKey: "return_station_id",
+        queryDbField: "return_station_id",
+        value: Number(req.query.return_station_id),
+        required: true,
+      },
+      // {
+      //   queryKey: "duration",
+      //   queryDbField: "duration",
+      //   value: Number(req.query.duration),
+      //   required: true,
+      // },
+    ];
+
+    const containAllRequires = mappedQueries.filter(
+      (query) => query.required && !!query.value
+    );
+
+    if (!containAllRequires.length) {
+      return res.status(400).json({
+        message: "must have at least 1 required queries",
+      });
+    }
+
+    const queries = {};
+    for (let i = 0; i < mappedQueries.length; i++) {
+      const query = mappedQueries[i];
+      if (query.value) {
+        queries[query.queryDbField] = query.value;
+      }
+    }
+
+    // const queries = mappedQueries.reduce((result, query) => {
+    //   if (query.value) {
+    //     result[query.queryDbField] = query.value;
+    //   }
+    //   return result;
+    // }, {});
+    console.log({ queries });
+
+    const journeyResult = await journeySchema.find(queries);
+
+    // Good Solution
+
+    // const departureStationId = req.query.departure_station_id
+    //   ? Number(req.query.departure_station_id)
+    //   : undefined;
+    // const returnStationId = req.query.return_station_id
+    //   ? Number(req.query.return_station_id)
+    //   : undefined;
+    // if (!departureStationId && !returnStationId) {
+    //   return res.status(400).json({
+    //     message: "must have either departure or return station id",
+    //   });
+    // }
+
+    // const hasAllQuery = {};
+    // if (departureStationId) {
+    //   hasAllQuery.departure_station_id = departureStationId;
+    // }
+    // if (returnStationId) {
+    //   hasAllQuery.return_station_id = returnStationId;
+    // }§
+    // console.log({ hasAllQuery });
+
+    // const journeyResult = await journeySchema.find(hasAllQuery);
+
+    if (!journeyResult.length) {
+      return res.status(404).json({ message: "No journey found" });
+    }
+
+    res.json(journeyResult);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send({ message: e.message });
+  }
+
+    //1st Solution
+
+    let journeyResult = await journeySchema.find({
+      departure_station_id: departureStationId,
+      return_station_id: returnStationId,
+    });
+
+    if (!journeyResult) {
+      return res.status(404).json({ message: "No journey found" });
+    }
+
+    res.json(journeyResult);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send({ message: e.message });
+  }
+
+});
+
+
+/** listen or Requests */
+/** Connect to Mongo */
+app.listen(PORT, async () => {
+  console.log(`Example app listening on port ${PORT}`);
+});
+
+mongoose.connection.once("open", () => {
+  console.log("Connected to MongoDB");
+});
+
+mongoose.connection.on("error", (err) => {
+  console.error(err);
+  logEvents(
+    `${err.no}: §{err.code}\t${err.syscall}\t${err.hostname}`,
+    "mongoErrLog.Log"
+  );
+});
