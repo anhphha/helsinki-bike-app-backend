@@ -97,6 +97,12 @@ app.get("/journeys", async (req, res) => {
   }
 });
 
+// Remove redundant data
+let redundantData = await journeySchema.deleteMany({
+
+})
+
+
 /** listen or Requests */
 /** Connect to Mongo */
 app.listen(PORT, async () => {
