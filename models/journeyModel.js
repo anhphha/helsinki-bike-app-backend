@@ -1,3 +1,4 @@
+const { Int32 } = require("mongodb");
 const mongoose = require("mongoose");
 mongoose.set('strictQuery', false);
 
@@ -11,29 +12,21 @@ const journeySchema = new mongoose.Schema({
     default: undefined,
   },
   departure_station_id: {
-    type: String,
-    default: undefined,
-  },
-  departure_station_name: {
-    type: String,
+    type: Number,
     default: undefined,
   },
   return_station_id: {
-    type: String,
-    default: undefined,
-  },
-  return_station_name: {
-    type: String,
+    type: Number,
     default: undefined,
   },
   covered_distance: {
-    type: String,
+    type: Number,
     default: undefined,
   },
   duration: {
-    type: String,
+    type: Number,
     default: undefined,
   },
 });
 
-module.exports = mongoose.model("Journey", journeySchema);
+module.exports = mongoose.model("journeys", journeySchema);
