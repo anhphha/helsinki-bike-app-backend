@@ -26,3 +26,5 @@ const searchStation = async (req, res) => {   //fat arrow
 };
 
 module.exports = { searchStation };
+
+// think about the test scenerio first
