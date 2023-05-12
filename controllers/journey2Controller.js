@@ -1,5 +1,11 @@
 const journeySchema = require("../models/journeyModel");
 
+//unit test sceneros
+//query.departure_station_id
+//query.return_station_id
+//hasAllQuery
+//journeyResult
+
 class journeyController {
   async searchJourney(req, res) {
     try {
