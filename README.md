@@ -2,6 +2,14 @@
 
 The apps purpose is to display information about Helsinki city bike stations and show data about journeys made with the bikes.
 
+# Main Responsibilities
+- Developed and maintain the back-end application and hosting database using Node.js and MongoDB
+- Wrote and maintained automated tests using Jest.js to ensure the application is reliable and efficient
+- Used Docker to containerize the application and managed deployments
+- Used Git for version control and collaborated with other developers using Git workflows
+- Implemented CI/CD pipelines to automate builds, tests, and deployments
+- Troubleshoot and debugged issues with the application
+
 # ToDo
 
 - Setup containers with docker-compose: MongoDB, API, Application
@@ -46,4 +54,4 @@ https://dev.hsl.fi/citybikes/od-trips-2021/2021-07.csv
 
 https://opendata.arcgis.com/datasets/726277c507ef4914b0aec3cbcfcbfafc_0.csv
 
-License and information: https://www.avoindata.fi/data/en/dataset/hsl-n-kaupunkipyoraasemat/resource/a23eef3a-cc40-4608-8aa2-c730d17e8902 
+License and information: https://www.avoindata.fi/data/en/dataset/hsl-n-kaupunkipyoraasemat/resource/a23eef3a-cc40-4608-8aa2-c730d17e8902

@@ -13,7 +13,7 @@ describe("searchStation", () => {
 
     await searchStation(mockReq, mockRes);
 
-    expect(stationSchema.aggregate).toHaveBeenCalledWith([  //deep object comparison 
+    expect(stationSchema.aggregate).toHaveBeenCalledWith([  //deep object comparison
       {
         $search: {
           index: "id_station",
